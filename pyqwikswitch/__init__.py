@@ -1,9 +1,9 @@
 """
-  QwikSwitch USB Modem API binding for Python
+  QwikSwitch USB Modem library for Python
 
   See: http://www.qwikswitch.co.za/qs-usb.php
 
-  Currently the class supports relays, buttons and LED dimmers
+  Currently supports relays, buttons and LED dimmers
 
   Author: kellerza
 """
@@ -59,7 +59,7 @@ class QSUsb(object):
             # Retrieve next cmd, or block
             packet = self._queue.get()
             if isinstance(packet, dict) and 'cmd' in packet:
-                self._callback(packet)
+                self.callback(packet)
             self._queue.task_done()
 
     def _listen_thread(self):
@@ -81,7 +81,12 @@ class QSUsb(object):
         """Stop listening"""
         self._running = False
 
-    def listen(self, callback, timeout=(5, 300)):
+    def callback(self, item):
+        """ callback supplied to listen() or can be overridden"""
+        if self._callback is not None:
+            self._callback(item)
+
+    def listen(self, callback=None, timeout=(5, 300)):
         """Start the &listen long poll and return immediately"""
         if self._running:
             return False
@@ -170,37 +175,3 @@ class QSUsb(object):
         except TypeError:
             pass
         return False
-
-
-def main():
-    """QSUsb class quick test"""
-    # pylint: disable=invalid-name
-    TEST_URL = 'http://localhost:2020'
-    TEST_ID = '@0ac2f0'
-
-    print('Execute a basic test on {}\nserver: {}\n'.format(TEST_ID, TEST_URL))
-
-    def print_cmd(item):
-        """prit a item"""
-        print('&listen [{}, {}={}]'.format(
-            item.get('cmd', ''),
-            item.get('id', ''),
-            item.get('data', '')))
-
-    qsusb = QSUsb(TEST_URL)
-
-    qsusb.listen(print_cmd, timeout=5)
-    print("Started listening")
-    print("\n\n.devices()\n")
-    print(qsusb.devices())
-    for value in (100, 50, 0):
-        sleep(3)
-        print("\nSet {} = {}".format(TEST_ID, value))
-        qsusb.set(TEST_ID, value)
-        print(qsusb.devices(TEST_ID))
-    sleep(20)
-    print("Stopped listening")
-    qsusb.stop()  # Close all threads
-
-if __name__ == "__main__":
-    main()

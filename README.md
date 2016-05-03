@@ -1,9 +1,9 @@
-# pyqwikswitch
-QwikSwitch USB Modem API binding for Python 3
+# pyqwikswitch library
+QwikSwitch USB Modem library for Python 3
 
   See http://www.qwikswitch.co.za for more information on the Qwikswitch devices
   
-  Currently the class supports relays, buttons and LED dimmers
+  Currently supports relays, buttons and LED dimmers
 
 ##  QSUsb class
 
@@ -30,4 +30,4 @@ QwikSwitch USB Modem API binding for Python 3
   
 ## Example usage
 
-Execute `python pyqwikswitch.py` for a set of basic tests
+See [example.py](./example.py) for a basic usage and tests
