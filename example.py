@@ -7,13 +7,14 @@ from time import sleep
 import pyqwikswitch
 
 TEST_URL = 'http://localhost:2020'
-TEST_ID = '@0ac2f0'
+TEST_DIM_ID = '@0ac2f0'
+TEST_RELAY_ID = '@0c2700'
 
 
 def main():
     """QSUsb class quick test"""
 
-    print('Execute a basic test on {}\nserver: {}\n'.format(TEST_ID, TEST_URL))
+    print('Execute a basic test on server: {}\n'.format(TEST_URL))
 
     def print_cmd(item):
         """prit a item"""
@@ -28,12 +29,17 @@ def main():
     print("Started listening")
     print("\n\n.devices()\n")
     print(qsusb.devices())
-    for value in (100, 50, 0):
-        sleep(3)
-        print("\nSet {} = {}".format(TEST_ID, value))
-        qsusb.set(TEST_ID, value)
-        print(qsusb.devices(TEST_ID))
-    sleep(20)
+    print("\n")
+    
+    for qsid in (TEST_RELAY_ID, TEST_DIM_ID):
+        for value in (100, 50, 0):
+            sleep(3)
+            print("\nSet {} = {}".format(qsid, value))
+            qsusb.set(qsid, value)
+            print(qsusb.devices(qsid))
+        sleep(2)
+    print("\n\n.Listening for 20 seconds (test buttons now)\n")
+    sleep(20)    
     print("Stopped listening")
     qsusb.stop()  # Close all threads
 

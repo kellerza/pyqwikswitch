@@ -138,7 +138,7 @@ class QSUsb(object):
         self._types[item['id']] = item['type']
         if item['type'] == 'rel':
             val = 0 if val == 'OFF' else \
-                  0 if val == 'ON' else -1
+                  100 if val == 'ON' else -1
             item['value'] = val
         elif item['type'] == 'dim':
             try:
