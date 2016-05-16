@@ -5,7 +5,7 @@
 
   Currently supports relays, buttons and LED dimmers
 
-  Author: kellerza
+    Source: http://www.github.com/kellerza/pyqwikswitch
 """
 
 from queue import Queue
@@ -14,6 +14,7 @@ from time import sleep
 import math
 import requests
 
+CMD = 'cmd'
 CMD_BUTTONS = ['TOGGLE', 'SCENE EXE', 'LEVEL']
 """
 Commands ['cmd'] strings used by QS buttons
@@ -57,9 +58,13 @@ class QSUsb(object):
         """Process callbacks from the queue populated by &listen"""
         while self._running:
             # Retrieve next cmd, or block
-            packet = self._queue.get()
-            if isinstance(packet, dict) and 'cmd' in packet:
-                self.callback(packet)
+            packet = self._queue.get(True)
+            if isinstance(packet, dict) and CMD in packet:
+                try:
+                    self.callback(packet)
+                except Exception as err:  # pylint: disable=broad-except
+                    self._log("Exception in qwikswitch callback\nType: " +
+                              str(type(err)) + "\nMessage: " + str(err))
             self._queue.task_done()
 
     def _listen_thread(self):
@@ -68,13 +73,22 @@ class QSUsb(object):
             try:
                 rest = requests.get(self._url + '&listen',
                                     timeout=self._timeout)
-                if rest.status_code != 200:
-                    continue
-                self._queue.put(rest.json())
-            except TypeError:
-                pass
-            except requests.exceptions.ConnectionError:
-                self._queue.put({'cmd': 'update'})
+                if rest.status_code == 200:
+                    self._queue.put(rest.json())
+                else:
+                    self._log('QSUSB response code ' + str(rest.status_code))
+                    sleep(30)
+            # Received for "Read timed out" and "Connection refused"
+            except requests.exceptions.ConnectionError as err:
+                if str(err).find('timed') > 0:  # "Read timedout" update
+                    self._queue.put({CMD: 'update'})
+                else:  # "Connection refused" QSUSB down
+                    self._log(str(err))
+                    sleep(60)
+            except Exception as err:  # pylint: disable=broad-except
+                self._log(str(type(err)) + str(err))
+                sleep(5)
+
         self._queue.put({})  # empty item to ensure callback thread shuts down
 
     def stop(self):

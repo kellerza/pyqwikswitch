@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Basic usage example and testing of pyqwikswitch
+Basic usage example and testing of pyqwikswitch.
 """
 
 from time import sleep
@@ -12,7 +12,7 @@ TEST_RELAY_ID = '@0c2700'
 
 
 def main():
-    """QSUsb class quick test"""
+    """QSUsb class quick test."""
 
     print('Execute a basic test on server: {}\n'.format(TEST_URL))
 
