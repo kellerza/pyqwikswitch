@@ -147,6 +147,8 @@ class QSUsb(object):
             elif _repeat > 1:
                 sleep(0.005*(6-_repeat))
                 return self.set(qs_id, value, _repeat-1)
+            else:
+                self._log("Unable to set {}={}".format(qs_id, value))
         return -1
 
     def _encode_value(self, qs_id, value):
