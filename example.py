@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Basic usage example and testing of pyqwikswitch."""
+"""Basic usage example and testing of pyqwikswitch. """
 
 from time import sleep
 import pyqwikswitch
