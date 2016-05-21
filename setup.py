@@ -4,7 +4,7 @@
 from setuptools import setup
 
 setup(name='pyqwikswitch',
-      version='0.1',
+      version='0.2',
       description='Library to interface Qwikswitch USB Hub',
       url='https://github.com/kellerza/pyqwikswitch',
       author='Johann Kellerman',
