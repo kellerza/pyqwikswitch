@@ -43,11 +43,56 @@ QS_TYPES = {'rel': QSType.relay,
             'dim': QSType.dimmer}
 
 
+def legacy_status(st):
+    """Legacy status method from the 'qsmobile.js' library.
+
+    Pass in the 'val' from &devices or the
+    'data' received after calling a specific ID.
+    """
+    # 2d0c00002a0000
+    if st[:2] == '30' or st[:2] == '47':  # RX1 CT
+        o = st[4:5]
+        # console.log("legstat. " + o);
+        if o == '0':
+            return 0
+        if o == '8':
+            return 100
+    if st == '7e':
+        return 0
+    if st == '7f':
+        return 100
+    if len(st) == 6:  # old
+        l = int(st[4:], 16)
+        hw = st[:2]
+        if hw == '01':  # old dim
+            return round(((125-l) / 125) * 100)
+        if hw == '02':  # old rel
+            return 100 if l == 127 else 0
+
+        if hw == '28':  # LED DIM
+            if st[2:4] == "01":
+                if st[4:] == '78':
+                    return 0
+            return round(((120 - l) / 120) * 100)
+
+    # Additional decodes not part of qsmobile.
+    if st.upper().find('ON') >= 0:
+        return 100
+    if len(st) == 0 or st.upper().find('OFF') >= 0:
+        return 0
+    if st.endswith('%'):
+        if st[:-1].isdigit:
+            return(int(st[:-1]))
+    print('val="{}" used a -1 fallback in legacy_status'.format(st))
+    return -1  # fallback to return an int
+    # return st
+
+
 # pylint: disable=too-many-instance-attributes
 class QSUsb(object):
     """Class to interface the QwikSwitch USB modem."""
 
-    def __init__(self, url, logger=None, dim_adj=1.4):
+    def __init__(self, url, logger=None, dim_adj=1.4, _offline=False):
         """Init the Qwikswitch class.
 
         url: URL for the QS class (e.g. http://localhost:8080)
@@ -63,7 +108,7 @@ class QSUsb(object):
         self._queue = None
         self._callback = None
         self._types = {}
-        if self.devices() is False:
+        if (not _offline) and (self.devices() is False):
             raise ValueError('Cannot connect to the QSUSB hub ' + url)
 
     def _log(self, msg):
@@ -168,7 +213,8 @@ class QSUsb(object):
         qstype = self._types.get(qs_id, '')
         if qstype == QSType.relay:
             return 0 if qsval == 'OFF' else \
-                   100 if qsval == 'ON' else -1
+                   100 if qsval == 'ON' else \
+                   legacy_status(qsval)
         elif qstype == QSType.dimmer and len(qsval) > 2:
             try:
                 val = (120-int(qsval[-2:], 16))/1.2
@@ -180,29 +226,32 @@ class QSUsb(object):
                 return -1
             else:
                 return min(val, 100)
-        return qsval
+        return legacy_status(qsval)
 
-    def devices(self, qs_ids=None):
+    def devices(self, qs_ids=None, devices=None):
         """Retrieve a list of devices and values (optionally limit to ID).
 
         Optionally limit the result to a list of QS_IDs.
         This will add the decoded value in [PQS_VALUE] for each device.
+        _devices should only used for testing purposes.
         """
         try:
-            rest = requests.get(self._url + '&device')
-            if rest.status_code == 200:
+            if not devices:
+                rest = requests.get(self._url + '&device')
+                if rest.status_code != 200:
+                    return False
                 devices = rest.json()
-                devices = [x for x in devices if QS_ID in x]  # Ensure ID
-                if qs_ids is not None:  # filter on 'ids'
-                    devices = [x for x in devices if x[QS_ID] in qs_ids]
-                for dev in devices:
-                    qs_id = dev[QS_ID]
-                    if qs_id not in self._types:
-                        self._types[qs_id] = QS_TYPES.get(dev[QS_TYPE],
-                                                          QSType.unknown)
-                    dev[PQS_TYPE] = self._types[qs_id]
-                    dev[PQS_VALUE] = self._decode_value(qs_id, dev[QS_VALUE])
-                return devices
+            devices = [x for x in devices if QS_ID in x]  # Ensure ID
+            if qs_ids is not None:  # filter on 'ids'
+                devices = [x for x in devices if x[QS_ID] in qs_ids]
+            for dev in devices:
+                qs_id = dev[QS_ID]
+                if qs_id not in self._types:
+                    self._types[qs_id] = QS_TYPES.get(dev[QS_TYPE],
+                                                      QSType.unknown)
+                dev[PQS_TYPE] = self._types[qs_id]
+                dev[PQS_VALUE] = self._decode_value(qs_id, dev[QS_VALUE])
+            return devices
         except requests.exceptions.ConnectionError as conn_err:
             self._log('Could not connect: '+str(conn_err))
         except TypeError:

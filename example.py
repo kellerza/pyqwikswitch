@@ -1,38 +1,37 @@
 #!/usr/bin/env python
-"""Basic usage example and testing of pyqwikswitch. """
+"""Basic usage example and testing of pyqwikswitch."""
 
 from time import sleep
 import pyqwikswitch
-
-TEST_URL = 'http://127.0.0.1:2020'
-TEST_IDS = ['@000001','@0c2700', '@0ac2f0']
+import json
 
 
-def main():
-    """QSUsb class quick test."""
-    print('Execute a basic test on server: {}\n'.format(TEST_URL))
-    url = input('Enter new URL of [Enter] for default: ')
-    if len(url) == 0:
-        url = TEST_URL
-
-    def print_callback(item):
-        """prit an item callback."""
-        print('&listen [{}, {}={}]'.format(
-            item.get('cmd', ''),
-            item.get('id', ''),
-            item.get('data', '')))
-
-    qsusb = pyqwikswitch.QSUsb(url)
-
-    qsusb.listen(print_callback, timeout=5)
-    print("Started listening")
-    devs = qsusb.devices()
-    print("\n\n.devices()\n[\n")
+def print_devices(devs):
+    """Print the reply from &devices() and highlight errors."""
+    print("\n\n&devices\n[")
     for dev in devs:
-        print(str(dev)+'\n')
-    print("]\n")
+        print('\n' + str(dev))
+        if not isinstance(dev[pyqwikswitch.PQS_VALUE], int):
+            print("ERR decoding: not integer")
+        elif dev[pyqwikswitch.PQS_VALUE] == -1:
+            print("ERR decoding: -1?")
+    print("\n]\n")
 
-    for qsid in TEST_IDS:
+
+def print_item_callback(item):
+    """Print an item callback, used by &listen."""
+    print('&listen [{}, {}={}]'.format(
+        item.get('cmd', ''),
+        item.get('id', ''),
+        item.get('data', '')))
+
+
+def test_qsusb_set(qsusb, ids):
+    """Test the set method for ids passed in.
+
+    In thie example using --test_ids @id1,@id2.
+    """
+    for qsid in ids:
         for value in (100, 50, 0):
             sleep(3)
             print("\nSet {} = {}".format(qsid, value))
@@ -40,10 +39,45 @@ def main():
             print("   --> result: {}".format(val))
             print(qsusb.devices(qsid))
         sleep(2)
-    print("\n\nListening for 20 seconds (test buttons now)\n")
-    sleep(20)
-    print("Stopped listening")
-    qsusb.stop()  # Close all threads
+
+
+def main():
+    """QSUsb class quick test."""
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--url', help='QSUSB URL [http://127.0.0.1:2020]',
+                        default='http://127.0.0.1:2020)')
+    parser.add_argument('--file', help='a test file from /&devices')
+    parser.add_argument('--test_ids', help='List of test IDs',
+                        default='@000001,@0c2700,@0ac2f0')
+    args = parser.parse_args()
+
+    if args.file:
+        with open(args.file) as data_file:
+            data = json.load(data_file)
+        qsusb = pyqwikswitch.QSUsb('', _offline=True)
+        print_devices(qsusb.devices(devices=data))
+        return
+
+    print('Execute a basic test on server: {}\n'.format(args.url))
+
+    qsusb = pyqwikswitch.QSUsb(args.url)
+    print_devices(qsusb.devices())
+
+    qsusb.listen(print_item_callback, timeout=5)
+    print("Started listening")
+    try:
+        # Do some test while listening
+        if args.test_ids and len(args.test_ids) > 0:
+            test_qsusb_set(qsusb, args.test_ids.split(','))
+
+        print("\n\nListening for 20 seconds (test buttons now)\n")
+        sleep(20)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        qsusb.stop()  # Close all threads
+        print("Stopped listening")
 
 if __name__ == "__main__":
     main()
