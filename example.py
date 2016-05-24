@@ -2,20 +2,22 @@
 """Basic usage example and testing of pyqwikswitch."""
 
 from time import sleep
-import pyqwikswitch
 import json
+import pyqwikswitch
 
 
 def print_devices(devs):
     """Print the reply from &devices() and highlight errors."""
-    print("\n\n&devices\n[")
+    print("\n&devices\n[")
     for dev in devs:
-        print('\n' + str(dev))
         if not isinstance(dev[pyqwikswitch.PQS_VALUE], int):
             print("ERR decoding: not integer")
         elif dev[pyqwikswitch.PQS_VALUE] == -1:
             print("ERR decoding: -1?")
-    print("\n]\n")
+        print(dev[pyqwikswitch.QS_VALUE] + ' --> ' +
+              str(dev[pyqwikswitch.PQS_VALUE]))
+        print('  ' + str(dev))
+    print(']\n')
 
 
 def print_item_callback(item):
@@ -62,6 +64,7 @@ def main():
     print('Execute a basic test on server: {}\n'.format(args.url))
 
     qsusb = pyqwikswitch.QSUsb(args.url)
+    print('Version: ' + qsusb.version())
     print_devices(qsusb.devices())
 
     qsusb.listen(print_item_callback, timeout=5)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""pyqwikswitch library setup"""
+"""pyqwikswitch library setup."""
 
 from setuptools import setup
 

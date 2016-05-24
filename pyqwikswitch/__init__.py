@@ -43,49 +43,50 @@ QS_TYPES = {'rel': QSType.relay,
             'dim': QSType.dimmer}
 
 
-def legacy_status(st):
+# pylint: disable=too-many-return-statements, too-many-branches
+def legacy_status(stat):
     """Legacy status method from the 'qsmobile.js' library.
 
     Pass in the 'val' from &devices or the
     'data' received after calling a specific ID.
     """
     # 2d0c00002a0000
-    if st[:2] == '30' or st[:2] == '47':  # RX1 CT
-        o = st[4:5]
+    if stat[:2] == '30' or stat[:2] == '47':  # RX1 CT
+        ooo = stat[4:5]
         # console.log("legstat. " + o);
-        if o == '0':
+        if ooo == '0':
             return 0
-        if o == '8':
+        if ooo == '8':
             return 100
-    if st == '7e':
+    if stat == '7e':
         return 0
-    if st == '7f':
+    if stat == '7f':
         return 100
-    if len(st) == 6:  # old
-        l = int(st[4:], 16)
-        hw = st[:2]
-        if hw == '01':  # old dim
-            return round(((125-l) / 125) * 100)
-        if hw == '02':  # old rel
-            return 100 if l == 127 else 0
+    if len(stat) == 6:  # old
+        val = int(stat[4:], 16)
+        hwt = stat[:2]
+        if hwt == '01':  # old dim
+            return round(((125-val) / 125) * 100)
+        if hwt == '02':  # old rel
+            return 100 if val == 127 else 0
 
-        if hw == '28':  # LED DIM
-            if st[2:4] == "01":
-                if st[4:] == '78':
+        if hwt == '28':  # LED DIM
+            if stat[2:4] == "01":
+                if stat[4:] == '78':
                     return 0
-            return round(((120 - l) / 120) * 100)
+            return round(((120 - val) / 120) * 100)
 
     # Additional decodes not part of qsmobile.
-    if st.upper().find('ON') >= 0:
+    if stat.upper().find('ON') >= 0:
         return 100
-    if len(st) == 0 or st.upper().find('OFF') >= 0:
+    if len(stat) == 0 or stat.upper().find('OFF') >= 0:
         return 0
-    if st.endswith('%'):
-        if st[:-1].isdigit:
-            return(int(st[:-1]))
-    print('val="{}" used a -1 fallback in legacy_status'.format(st))
+    if stat.endswith('%'):
+        if stat[:-1].isdigit:
+            return int(stat[:-1])
+    print('val="{}" used a -1 fallback in legacy_status'.format(stat))
     return -1  # fallback to return an int
-    # return st
+    # return stat
 
 
 # pylint: disable=too-many-instance-attributes
@@ -108,7 +109,7 @@ class QSUsb(object):
         self._queue = None
         self._callback = None
         self._types = {}
-        if (not _offline) and (self.devices() is False):
+        if (not _offline) and (self.version() is False):
             raise ValueError('Cannot connect to the QSUSB hub ' + url)
 
     def _log(self, msg):
@@ -163,6 +164,14 @@ class QSUsb(object):
         """Callback supplied to listen() or can be overridden."""
         if self._callback is not None:
             self._callback(item)
+
+    def version(self):
+        """Get the QS Mobile version."""
+        # requests.get destroys the ?
+        import urllib
+        with urllib.request.urlopen(self._url + '&version?') as response:
+            return response.read().decode('utf-8')
+        return False
 
     def listen(self, callback=None, timeout=(5, 300)):
         """Start the &listen long poll and return immediately."""
