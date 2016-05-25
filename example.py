@@ -14,6 +14,9 @@ def print_devices(devs):
             print("ERR decoding: not integer")
         elif dev[pyqwikswitch.PQS_VALUE] == -1:
             print("ERR decoding: -1?")
+        qcord = pyqwikswitch.decode_qwikcord(dev[pyqwikswitch.QS_VALUE])
+        if qcord is not None:
+            print('  qwikcord (CTAVG, CTsum) = ' + str(qcord))
         print(dev[pyqwikswitch.QS_VALUE] + ' --> ' +
               str(dev[pyqwikswitch.PQS_VALUE]))
         print('  ' + str(dev))

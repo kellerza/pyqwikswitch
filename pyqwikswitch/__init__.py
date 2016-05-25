@@ -44,7 +44,7 @@ QS_TYPES = {'rel': QSType.relay,
 
 
 # pylint: disable=too-many-return-statements, too-many-branches
-def legacy_status(stat):
+def _legacy_status(stat):
     """Legacy status method from the 'qsmobile.js' library.
 
     Pass in the 'val' from &devices or the
@@ -63,37 +63,45 @@ def legacy_status(stat):
     if stat == '7f':
         return 100
     if len(stat) == 6:  # old
-        val = int(stat[4:], 16)
+        try:
+            val = int(stat[4:], 16)
+        except ValueError:
+            val = 0
         hwt = stat[:2]
         if hwt == '01':  # old dim
-            return round(((125-val) / 125) * 100)
+            return round(((125 - val) / 125) * 100)
         if hwt == '02':  # old rel
             return 100 if val == 127 else 0
-
         if hwt == '28':  # LED DIM
-            if stat[2:4] == "01":
+            if stat[2:4] == '01':
                 if stat[4:] == '78':
                     return 0
             return round(((120 - val) / 120) * 100)
 
-    # Additional decodes not part of qsmobile.
-    if stat.upper().find('ON') >= 0:
+    # Additional decodes not part of qsmobile.js
+    if stat.upper().find('ON') >= 0:  # Relay
         return 100
     if len(stat) == 0 or stat.upper().find('OFF') >= 0:
         return 0
-    if stat.endswith('%'):
+    if stat.endswith('%'):  # New style dimmers
         if stat[:-1].isdigit:
             return int(stat[:-1])
     print('val="{}" used a -1 fallback in legacy_status'.format(stat))
     return -1  # fallback to return an int
     # return stat
 
+def decode_qwikcord(val):
+    """ Returns qwikcord (CTavg, CTsum)."""
+    if len(val) != 16:
+        return None
+    return (int(val[6:12],16), int(val[12:], 16))
+
 
 # pylint: disable=too-many-instance-attributes
 class QSUsb(object):
     """Class to interface the QwikSwitch USB modem."""
 
-    def __init__(self, url, logger=None, dim_adj=1.4, _offline=False):
+    def __init__(self, url, logger=None, dim_adj=1, _offline=False):
         """Init the Qwikswitch class.
 
         url: URL for the QS class (e.g. http://localhost:8080)
@@ -219,23 +227,12 @@ class QSUsb(object):
 
     def _decode_value(self, qs_id, qsval):
         """Encode value to be passed to QSUSB."""
+        val = _legacy_status(qsval)
         qstype = self._types.get(qs_id, '')
-        if qstype == QSType.relay:
-            return 0 if qsval == 'OFF' else \
-                   100 if qsval == 'ON' else \
-                   legacy_status(qsval)
-        elif qstype == QSType.dimmer and len(qsval) > 2:
-            try:
-                val = (120-int(qsval[-2:], 16))/1.2
-                # Adjust dimmer exponentially to get a smoother effect
-                val = round(math.pow(val, self._dim_adj))
-            except ValueError:
-                self._log('''Unable to convert hex value in QS dimmer data
-                          {}: {}'''.format(qs_id, val[-2:]))
-                return -1
-            else:
-                return min(val, 100)
-        return legacy_status(qsval)
+        if qstype == QSType.dimmer:
+            # Adjust dimmer exponentially to get a smoother effect
+            val = min(round(math.pow(val, self._dim_adj)), 100)
+        return val
 
     def devices(self, qs_ids=None, devices=None):
         """Retrieve a list of devices and values (optionally limit to ID).

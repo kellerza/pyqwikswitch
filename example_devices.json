@@ -1,0 +1,18 @@
+[
+{"id":"@000001","name":"Relay 5A On","type":"rel","val":"ON","time":"1464116963","rssi":"49%"},
+{"id":"@000001","name":"Relay 5A Off","type":"rel","val":"OFF","time":"1464116963","rssi":"49%"},
+
+{"id":"@000002","name":"LED Dimmer 20%","type":"dim","val":"280c60","time":"1464116898","rssi":"50%"},
+{"id":"@000002","name":"LED Dimmer 100%","type":"dim","val":"280c00","time":"1464116898","rssi":"74%"},
+{"id":"@000002","name":"LED Dimmer 0%","type":"dim","val":"280c78","time":"1464116900","rssi":"76%"},
+
+{"id":"@000003","name":"RX1Dim 0%","type":"dim","val":"0%","time":"1464035111","rssi":"60%"},
+{"id":"@000003","name":"RX1Dim 50%","type":"dim","val":"50%","time":"1464035110","rssi":"66%"},
+{"id":"@000003","name":"RX1Dim 3","type":"dim","val":"100%","time":"1464035110","rssi":"66%"},
+{"id":"@000003","name":"Led driver 4","type":"dim","val":"","time":"","rssi":""},
+
+{"id":"@000004","name":"Qwikcord Off?","type":"rel","val":"","time":"","rssi":""},
+{"id":"@000004","name":"Qwikcord On","type":"rel","val":"4733800001a00000","time":"1464034926","rssi":"64%"},
+{"id":"@000004","name":"Qwikcord Off","type":"rel","val":"47330000026f0000","time":"1464035371","rssi":"43%"},
+{"id":"@000004","name":"Qwikcord On","type":"rel","val":"4733800dd623000f","time":"1464034783","rssi":"56%"}
+]
