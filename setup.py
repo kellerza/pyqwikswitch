@@ -4,12 +4,12 @@
 from setuptools import setup
 
 setup(name='pyqwikswitch',
-      version='0.3',
+      version='0.4',
       description='Library to interface Qwikswitch USB Hub',
       url='https://github.com/kellerza/pyqwikswitch',
       author='Johann Kellerman',
       author_email='kellerza@gmail.com',
       license='MIT',
       packages=['pyqwikswitch'],
-      install_requires=['requests'],
+      install_requires=['requests>=2,<3'],
       zip_safe=True)

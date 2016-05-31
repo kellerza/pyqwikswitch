@@ -90,11 +90,12 @@ def _legacy_status(stat):
     return -1  # fallback to return an int
     # return stat
 
+
 def decode_qwikcord(val):
-    """ Returns qwikcord (CTavg, CTsum)."""
+    """Extract the qwikcord current measurements from val (CTavg, CTsum)."""
     if len(val) != 16:
         return None
-    return (int(val[6:12],16), int(val[12:], 16))
+    return (int(val[6:12], 16), int(val[12:], 16))
 
 
 # pylint: disable=too-many-instance-attributes
