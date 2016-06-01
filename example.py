@@ -51,7 +51,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--url', help='QSUSB URL [http://127.0.0.1:2020]',
-                        default='http://127.0.0.1:2020)')
+                        default='http://127.0.0.1:2020')
     parser.add_argument('--file', help='a test file from /&devices')
     parser.add_argument('--test_ids', help='List of test IDs',
                         default='@000001,@0c2700,@0ac2f0')

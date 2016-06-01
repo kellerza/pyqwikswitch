@@ -118,7 +118,9 @@ class QSUsb(object):
         self._queue = None
         self._callback = None
         self._types = {}
-        if (not _offline) and (self.version() is False):
+        self._lock = threading.Lock()
+
+        if (not _offline) and (self.devices() is False):
             raise ValueError('Cannot connect to the QSUSB hub ' + url)
 
     def _log(self, msg):
@@ -196,22 +198,18 @@ class QSUsb(object):
         threading.Thread(target=self._callback_thread, args=()).start()
         return True
 
-    def set(self, qs_id, value, _repeat=None):
+    def set(self, qs_id, value):
         """Push state to QSUSB, retry with backoff."""
-        if _repeat is None:
-            _repeat = 5
-            value = self._encode_value(qs_id, value)
-
-        set_result = requests.get(self._url + qs_id + '=' + str(value))
-        if set_result.status_code == 200:
-            set_result = set_result.json()
-            if set_result.get('data', 'NO REPLY') != 'NO REPLY':
-                return self._decode_value(qs_id, set_result['data'])
-            elif _repeat > 1:
-                sleep(0.005*(6-_repeat))
-                return self.set(qs_id, value, _repeat-1)
-            else:
-                self._log("Unable to set {}={}".format(qs_id, value))
+        value = self._encode_value(qs_id, value)
+        with self._lock:
+            for _repeat in range(1, 6):
+                set_result = requests.get(self._url + qs_id + '=' + str(value))
+                if set_result.status_code == 200:
+                    set_result = set_result.json()
+                    if set_result.get('data', 'NO REPLY') != 'NO REPLY':
+                        return self._decode_value(qs_id, set_result['data'])
+                sleep(0.01*_repeat)
+        self._log("Unable to set {}={}".format(qs_id, value))
         return -1
 
     def _encode_value(self, qs_id, value):
