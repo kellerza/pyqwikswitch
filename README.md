@@ -11,9 +11,11 @@ QwikSwitch USB Modem library for Python 3
   
  `QSUsb.devices()`
 
-  ```  [{"id": "@0c26e0","name": "buitelig","type": "rel","val": "ON",
+  ```
+  [{"id": "@0c26e0","name": "buitelig","type": "rel","val": "ON",
         "time": "1460146507","rssi": "45%"},
-    .....]```
+    .....]
+  ```
 
 * Long poll *(http://localhost:8080/&listen)* for device changes and
     button presses. This is non-blocking and should be stopped manually (`.stop()`)
