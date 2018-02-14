@@ -9,7 +9,7 @@ QwikSwitch USB Modem library for Python 3
 
 * Get a list of all devices & values. *(http://localhost:8080/&device)*
   
- `QSUsb.devices()`
+  `QSUsb.devices()`
 
   ```
   [{"id": "@0c26e0","name": "buitelig","type": "rel","val": "ON",
