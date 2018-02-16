@@ -1,0 +1,6 @@
+[
+{"id":"@0c2640","cmd":"STATUS.ACK","data":"OFF,RX1REL,V43","rssi":"46%"},
+{"id":"@12bba0","cmd":"STATUS.ACK","data":"OFF,RX1REL,V50","rssi":"60%"},
+{"id":"@0b3411","cmd":"TOGGLE","data":"","rssi":"57%"},
+{"id":"@12df33","cmd":"LEVEL","data":"0%","rssi":"63%"}
+]
