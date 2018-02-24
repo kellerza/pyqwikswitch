@@ -50,6 +50,7 @@ QS_TYPES = {'rel': QSType.relay,
             'dim': QSType.dimmer}
 _MAX = 255
 
+
 # pylint: disable=too-many-return-statements, too-many-branches
 def _legacy_status(stat):
     """Legacy status method from the 'qsmobile.js' library.
@@ -88,7 +89,7 @@ def _legacy_status(stat):
     # Additional decodes not part of qsmobile.js
     if stat.upper().find('ON') >= 0:  # Relay
         return 100
-    if len(stat) == 0 or stat.upper().find('OFF') >= 0:  # pylint: disable=C1801
+    if (not stat) or stat.upper().find('OFF') >= 0:
         return 0
     if stat.endswith('%'):  # New style dimmers
         if stat[:-1].isdigit:
@@ -138,7 +139,7 @@ class QSDevices:
                 return val[_KEYS.index(key[1])]
             return val[key[1]]
         except KeyError:
-            raise KeyError("Key {} not found/invalid in the devices".format(key))
+            raise KeyError("Key {} not found/invalid".format(key))
 
     def __len__(self):
         """Return the length."""
@@ -164,9 +165,8 @@ class QSDevices:
         def success():
             """Success closure to update value."""
             self._data[key][1] = new  # qsd[1] = new
-            _LOGGER.debug("set success CB %s", new)
+            _LOGGER.debug("set success %s", new)
             self._cb_value_changed(self, key, new)
-
 
         newqs = round(math.pow(round(new/_MAX*100), 1/self.dim_adj))
         _LOGGER.debug("%s hass=%s --> %s", key, new, newqs)
@@ -177,13 +177,12 @@ class QSDevices:
         for dev in devices:
             try:
                 _id = dev[QS_ID]
-                # _LOGGER.warning("update %s", _id)
             except KeyError:
-                _LOGGER.error("BAD id %s", dev)
+                _LOGGER.debug("Device without ID: %s", dev)
                 continue
             if _id not in self._data:
                 self._data[_id] = [QS_TYPES.get(dev[QS_TYPE],
-                                                QSType.unknown), 0.1, dev]
+                                                QSType.unknown), -5, dev]
 
             qsd = self._data[_id]
             qsd[2] = dev
@@ -193,8 +192,7 @@ class QSDevices:
                 # Adjust dimmer exponentially to get a smoother effect
                 newqs = min(round(math.pow(newqs, self.dim_adj)), 100)
             newin = round(newqs*_MAX/100)
-            if abs(qsd[1]-newin)>1:
-                _LOGGER.warning("%s qs=%s  -->  %s", _id, newqs, newin)
+            if abs(qsd[1]-newin) > 1:
+                _LOGGER.debug("%s qs=%s  -->  %s", _id, newqs, newin)
                 qsd[1] = newin
-                #_LOGGER.warning("update from qs CB %s=%s %s %s", _id, newin, dev.get('val', ""), self._data[_id][1])
                 self._cb_value_changed(self, _id, newin)

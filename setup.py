@@ -4,10 +4,10 @@
 from setuptools import setup
 
 setup(name='pyqwikswitch',
-      version='0.4',
+      version='0.5',
       description='Library to interface Qwikswitch USB Hub',
       url='https://github.com/kellerza/pyqwikswitch',
-      download_url='https://github.com/kellerza/pyqwikswitch/tarball/0.4',
+      download_url='https://github.com/kellerza/pyqwikswitch/tarball/0.5',
       author='Johann Kellerman',
       author_email='kellerza@gmail.com',
       license='MIT',

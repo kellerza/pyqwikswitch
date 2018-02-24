@@ -131,8 +131,5 @@ class QSUsb(object):
             return True
         except requests.exceptions.ConnectionError as conn_err:
             _LOGGER.error("Could not connect: %s", conn_err)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             _LOGGER.error(err)
-        # _LOGGER.warning("update from devices %s", len(rest.json()))
-        # _LOGGER.warning("update from devices %s", self.devices)
-        # _LOGGER.warning("update from devices %s", self.devices.update_devices)
