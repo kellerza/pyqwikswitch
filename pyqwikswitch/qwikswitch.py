@@ -6,7 +6,6 @@ Currently supports relays, buttons and LED dimmers
 
 Source: http://www.github.com/kellerza/pyqwikswitch
 """
-
 import logging
 import math
 from enum import Enum
@@ -94,7 +93,7 @@ def _legacy_status(stat):
     if stat.endswith('%'):  # New style dimmers
         if stat[:-1].isdigit:
             return int(stat[:-1])
-    print('val="{}" used a -1 fallback in legacy_status'.format(stat))
+    _LOGGER.warning("val='%s' used a -1 fallback in legacy_status", stat)
     return -1  # fallback to return an int
     # return stat
 
@@ -111,6 +110,7 @@ _KEYS = [QS_TYPE, QS_VALUE, QSDATA]
 
 class QSDevices:
     """Represent the devices from QS Mobile."""
+
     _data = {}
 
     def __init__(self, cb_value_changed, cb_set_qsvalue, dim_adj=1):

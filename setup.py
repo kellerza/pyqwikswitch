@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 """pyqwikswitch library setup."""
-
 from setuptools import setup
+
+REQUIREMENTS = ['requests']
 
 setup(name='pyqwikswitch',
       version='0.5',
@@ -12,5 +13,5 @@ setup(name='pyqwikswitch',
       author_email='kellerza@gmail.com',
       license='MIT',
       packages=['pyqwikswitch'],
-      install_requires=['requests>=2,<3'],
+      install_requires=REQUIREMENTS,
       zip_safe=True)
