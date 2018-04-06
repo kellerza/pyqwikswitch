@@ -1,6 +1,6 @@
-[
-{"id":"@0c2640","cmd":"STATUS.ACK","data":"OFF,RX1REL,V43","rssi":"46%"},
-{"id":"@12bba0","cmd":"STATUS.ACK","data":"OFF,RX1REL,V50","rssi":"60%"},
-{"id":"@0b3411","cmd":"TOGGLE","data":"","rssi":"57%"},
-{"id":"@12df33","cmd":"LEVEL","data":"0%","rssi":"63%"}
-]
+{"id":"@000640","cmd":"STATUS.ACK","data":"OFF,RX1REL,V43","rssi":"46%"}
+{"id":"@000ba0","cmd":"STATUS.ACK","data":"OFF,RX1REL,V50","rssi":"60%"}
+{"id":"@000411","cmd":"TOGGLE","data":"","rssi":"57%"}
+{"id":"@000f33","cmd":"LEVEL","data":"0%","rssi":"63%"}
+Open: {"id":"@12345","cmd":"STATUS.ACK","data":"460e00","rssi":"75%"}
+Closed: {"id":"@12345","cmd":"STATUS.ACK","data":"460e64","rssi":"80%"}
