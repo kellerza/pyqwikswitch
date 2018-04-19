@@ -29,26 +29,25 @@ class QSUsb(object):
         self.loop = session.loop
         self._running = False
         self.devices = QSDevices(
-            callback_value_changed, self._callback_set_qs_value, dim_adj)
+            callback_value_changed, self.set_qs_value, dim_adj)
         self._timeout = 300
         self._types = {}
         self._aio_session = session
+        self._sleep_task = None
 
     async def get_json(self, url, timeout=30, astext=False):
         """Get URL and parse JOSN from text."""
         try:
             with async_timeout.timeout(timeout):
                 res = await self._aio_session.get(url)
-        except asyncio.TimeoutError:
-            return None
-        except aiohttp.client_exceptions.ClientConnectorError:
+                if res.status != 200:
+                    _LOGGER.error("QSUSB returned %s [%s]", res.status, url)
+                    return None
+                res_text = await res.text()
+        except (aiohttp.client_exceptions.ClientConnectorError,
+                asyncio.TimeoutError):
             return None
 
-        if res.status != 200:
-            _LOGGER.error("QSUSB returned %s [%s]", res.status, url)
-            return None
-
-        res_text = await res.text()
         if astext:
             return res_text
 
@@ -62,6 +61,9 @@ class QSUsb(object):
     def stop(self):
         """Stop listening."""
         self._running = False
+        if self._sleep_task:
+            self._sleep_task.cancel()
+            self._sleep_task = None
 
     def version(self):
         """Get the QS Mobile version."""
@@ -75,13 +77,21 @@ class QSUsb(object):
     async def _async_listen(self, callback=None):
         """Listen loop."""
         while True:
-            packet = await self.get_json(URL_LISTEN.format(self._url), 30)
-
-            if not self._running:
+            if self._running:
+                packet = await self.get_json(URL_LISTEN.format(self._url), 30)
+            else:
                 return
 
             if not packet:
-                await asyncio.sleep(30)
+                _LOGGER.debug('sleep start...')
+                self._sleep_task = self.loop.create_task(asyncio.sleep(30))
+                try:
+                    await self._sleep_task
+                    _LOGGER.debug('sleep done...')
+                except asyncio.CancelledError:
+                    _LOGGER.debug('sleep cancelled...')
+
+                self._sleep_task = None
                 continue
 
             if isinstance(packet, dict) and QS_CMD in packet:
@@ -91,21 +101,22 @@ class QSUsb(object):
                     _LOGGER.error("Exception in callback\nType: %s: %s",
                                   type(err), err)
 
-    def _callback_set_qs_value(self, key, val, success):
+    def set_qs_value(self, qsid, val, success_cb):
         """Push state to QSUSB, retry with backoff."""
-        self.loop.create_task(
-            self._async_callback_set_qs_value(key, val, success))
+        self.loop.create_task(self.async_set_qs_value(qsid, val, success_cb))
 
-    async def _async_callback_set_qs_value(self, key, val, success):
-        set_url = URL_SET.format(self._url, key, val)
+    async def async_set_qs_value(self, qsid, val, success_cb=None):
+        """Push state to QSUSB, retry with backoff."""
+        set_url = URL_SET.format(self._url, qsid, val)
         for _repeat in range(1, 6):
             set_result = await self.get_json(set_url, 2)
-            if set_result:
-                if set_result.get('data', 'NO REPLY') != 'NO REPLY':
-                    success()
-                    return
+            if set_result and set_result.get('data', 'NO REPLY') != 'NO REPLY':
+                if success_cb:
+                    success_cb()
+                return True
             await asyncio.sleep(0.01*_repeat)
         _LOGGER.error("Unable to set %s", set_url)
+        return False
 
     async def update_from_devices(self):
         """Retrieve a list of &devices and values."""

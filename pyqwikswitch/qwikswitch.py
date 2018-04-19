@@ -193,8 +193,9 @@ class QSDevices(dict):
                 self._cb_value_changed(self, qsid, newin)
 
 
-def decode_qwikcord(val, channel=1):
+def decode_qwikcord(packet, channel=1):
     """Extract the qwikcord current measurements from val (CTavg, CTsum)."""
+    val = str(packet.get('val', ''))
     if len(val) != 16:
         return None
     if channel == 1:
@@ -202,8 +203,9 @@ def decode_qwikcord(val, channel=1):
     return int(val[12:], 16)  # CTsum
 
 
-def decode_door(val, channel=1):
+def decode_door(packet, channel=1):
     """Decode a door sensor."""
+    val = str(packet.get('data', ''))
     if len(val) == 6 and val.startswith('46') and channel == 1:
         return val[-1] == '0'
     return None
@@ -218,8 +220,9 @@ def decode_door(val, channel=1):
 #     17/xx: All open / Channels 1-4 at 0004 0321
 # byte 3: last change (imod)
 
-def decode_imod(val, channel=1):
+def decode_imod(packet, channel=1):
     """Decode an 4 channel imod. May support 6 channels."""
+    val = str(packet.get('data', ''))
     if len(val) == 8 and val.startswith('4e'):
         try:
             _map = ((5, 1), (5, 2), (5, 4), (4, 1), (5, 1), (5, 2))[channel-1]
