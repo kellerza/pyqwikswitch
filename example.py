@@ -4,7 +4,8 @@
 from time import sleep
 import json
 import pyqwikswitch
-from pyqwikswitch.threaded import (QSUsb, QSType, QS_ID)
+from pyqwikswitch import (QSType, QS_ID)
+from pyqwikswitch.threaded import (QSUsb)
 
 
 def print_bad_data(json):
