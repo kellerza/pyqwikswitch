@@ -240,7 +240,7 @@ def decode_pir(packet):
     """Decode a PIR"""
     val = str(packet.get(QSDATA, ''))
     if len(val) == 8 and val.startswith('0f'):
-        return int(val[-4]) > 0
+        return int(val[-4:],16) > 0
     return None
 
 # byte 0:  34 = temperature / humidity
