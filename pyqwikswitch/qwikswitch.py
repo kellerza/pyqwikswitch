@@ -109,7 +109,8 @@ class QSDev():
 
     def __attrs_post_init__(self):
         """Init."""
-        _types = {'rel': QSType.relay, 'dim': QSType.dimmer, 'hum': QSType.humidity_temperature}
+        _types = {'rel': QSType.relay, 'dim': QSType.dimmer,
+                  'hum': QSType.humidity_temperature}
         self.qstype = _types.get(self.data.get(QS_TYPE, ''), QSType.unknown)
 
     @property
@@ -232,42 +233,48 @@ def decode_imod(packet, channel=1):
             return None
     return None
 
+
 # byte 0:  0f = pir
 # byte 1:  firmware
-# byte 2 and 3:  number of seconds (in hex) that the PIR sends until a device should react.
+# byte 2 and 3:  number of seconds (in hex) that the PIR sends
+#                until a device should react.
 
-def decode_pir(packet):
-    """Decode a PIR"""
+def decode_pir(packet, channel=1):
+    """Decode a PIR."""
     val = str(packet.get(QSDATA, ''))
-    if len(val) == 8 and val.startswith('0f'):
-        return int(val[-4:],16) > 0
+    if len(val) == 8 and val.startswith('0f') and channel == 1:
+        return int(val[-4:], 16) > 0
     return None
+
 
 # byte 0:  34 = temperature / humidity
 # byte 1:  firmware
 # byte 2-3:  humidity
 # byte 4-5:  temperature
-    
-def decode_temperature(packet):
-    """Decode the temperature"""
-    if len(val) == 12 and val.startswith('34'):
-      temperature = int(val[-4:], 16)
-      return round(float((-46.85 + (175.72 * (temperature / pow(2, 16))))))
+
+def decode_temperature(packet, channel=1):
+    """Decode the temperature."""
+    val = str(packet.get(QSDATA, ''))
+    if len(val) == 12 and val.startswith('34') and channel == 1:
+        temperature = int(val[-4:], 16)
+        return round(float((-46.85 + (175.72 * (temperature / pow(2, 16))))))
     return None
 
-def decode_humidity(packet):
-    """Decode the humidity"""
+
+def decode_humidity(packet, channel=1):
+    """Decode the humidity."""
     val = str(packet.get(QSDATA, ''))
-    if len(val) == 12 and val.startswith('34'):
-      humidity = int(val[4:-4],16)
-      return round(float(-6 + (125 * (humidity / pow(2, 16)))))
+    if len(val) == 12 and val.startswith('34') and channel == 1:
+        humidity = int(val[4:-4], 16)
+        return round(float(-6 + (125 * (humidity / pow(2, 16)))))
     return None
-    
+
+
 SENSORS = {
     'imod': (decode_imod, bool),
     'door': (decode_door, bool),
-    'pir' : (decode_pir, bool),
-    'temperature' : (decode_temperature, int),
-    'humidity' : (decode_humidity, int),
+    'pir': (decode_pir, bool),
+    'temperature': (decode_temperature, 'degC'),
+    'humidity': (decode_humidity, '%'),
     'qwikcord': (decode_qwikcord, 'A/s'),
 }

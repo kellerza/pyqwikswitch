@@ -9,6 +9,7 @@ from pyqwikswitch.threaded import (QSUsb)
 
 
 def print_bad_data(json):
+    """Print error if ID invalid."""
     for dev in json:
         if QS_ID not in dev:
             print("**ERR NO ID:", dev)
