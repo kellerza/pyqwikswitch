@@ -9,6 +9,7 @@ Source: http://www.github.com/kellerza/pyqwikswitch
 import logging
 import math
 from enum import Enum
+
 import attr
 
 _LOGGER = logging.getLogger(__name__)
@@ -109,6 +110,7 @@ class QSDev():
 
     def __attrs_post_init__(self):
         """Init."""
+        # pylint: disable=no-member
         _types = {'rel': QSType.relay, 'dim': QSType.dimmer,
                   'hum': QSType.humidity_temperature}
         self.qstype = _types.get(self.data.get(QS_TYPE, ''), QSType.unknown)
@@ -116,6 +118,7 @@ class QSDev():
     @property
     def name(self):
         """Return the name from the qsusb data."""
+        # pylint: disable=unsubscriptable-object
         try:
             return self.data[QS_NAME]
         except IndexError:
@@ -124,7 +127,7 @@ class QSDev():
     @property
     def qsid(self):
         """Return the name from the qsusb data."""
-        return self.data.get(QS_ID, '')
+        return self.data.get(QS_ID, '')  # pylint: disable=no-member
 
     @property
     def is_dimmer(self):
@@ -155,7 +158,7 @@ class QSDevices(dict):
             return
 
         if dev.is_dimmer:
-            new = _MAX if new > (_MAX*.9) else new
+            new = _MAX if new > (_MAX * .9) else new
         else:  # QSType.relay and any other
             new = _MAX if new > 0 else 0
 
@@ -165,7 +168,7 @@ class QSDevices(dict):
             _LOGGER.debug("set success %s=%s", qsid, new)
             self._cb_value_changed(self, qsid, new)
 
-        newqs = round(math.pow(round(new/_MAX*100), 1/self.dim_adj))
+        newqs = round(math.pow(round(new / _MAX * 100), 1 / self.dim_adj))
         _LOGGER.debug("%s hass=%s --> %s", qsid, new, newqs)
         self._cb_set_qsvalue(qsid, newqs, success)
 
@@ -188,7 +191,7 @@ class QSDevices(dict):
             if dev.is_dimmer:
                 # Adjust dimmer exponentially to get a smoother effect
                 newqs = min(round(math.pow(newqs, self.dim_adj)), 100)
-            newin = round(newqs*_MAX/100)
+            newin = round(newqs * _MAX / 100)
             if abs(dev.value - newin) > 1:  # Significant change
                 _LOGGER.debug("%s qs=%s  -->  %s", qsid, newqs, newin)
                 dev.value = newin
@@ -227,7 +230,8 @@ def decode_imod(packet, channel=1):
     val = str(packet.get(QSDATA, ''))
     if len(val) == 8 and val.startswith('4e'):
         try:
-            _map = ((5, 1), (5, 2), (5, 4), (4, 1), (5, 1), (5, 2))[channel-1]
+            _map = ((5, 1), (5, 2), (5, 4), (4, 1), (5, 1), (5, 2))[
+                channel - 1]
             return (int(val[_map[0]], 16) & _map[1]) == 0
         except IndexError:
             return None

@@ -52,7 +52,7 @@ def test_devices_set(devices, ids):
 
 
 def main():
-    """QSUsb class quick test."""
+    """Quick test for QSUsb class."""
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--url', help='QSUSB URL [http://127.0.0.1:2020]',

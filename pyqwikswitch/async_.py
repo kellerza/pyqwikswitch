@@ -114,7 +114,7 @@ class QSUsb(object):
                 if success_cb:
                     success_cb()
                 return True
-            await asyncio.sleep(0.01*_repeat)
+            await asyncio.sleep(0.01 * _repeat)
         _LOGGER.error("Unable to set %s", set_url)
         return False
 
