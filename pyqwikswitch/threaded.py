@@ -115,7 +115,7 @@ class QSUsb(object):
                         # self.devices._set_qs_value(key, set_result['data'])
                         success()
                         return True
-                sleep(0.01*_repeat)
+                sleep(0.01 * _repeat)
         _LOGGER.error("Unable to set %s", set_url)
         return False
 
