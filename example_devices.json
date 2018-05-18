@@ -14,5 +14,6 @@
 {"id":"@400001","name":"Qwikcord Off?","type":"rel","val":"","time":"","rssi":""},
 {"id":"@400002","name":"Qwikcord On","type":"rel","val":"4733800001a00000","time":"1464034926","rssi":"64%"},
 {"id":"@400003","name":"Qwikcord Off","type":"rel","val":"47330000026f0000","time":"1464035371","rssi":"43%"},
-{"id":"@400004","name":"Qwikcord On","type":"rel","val":"4733800dd623000f","time":"1464034783","rssi":"56%"}
+{"id":"@400004","name":"Qwikcord On","type":"rel","val":"4733800dd623000f","time":"1464034783","rssi":"56%"},
+{"id":"@500001","name":"Temp Sensor","type":"hum","val":"340c93ca61c0","time":"1525380034","rssi": "79%"}
 ]

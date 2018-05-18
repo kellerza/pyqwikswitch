@@ -4,3 +4,53 @@
 {"id":"@000f33","cmd":"LEVEL","data":"0%","rssi":"63%"}
 Open: {"id":"@12345","cmd":"STATUS.ACK","data":"460e00","rssi":"75%"}
 Closed: {"id":"@12345","cmd":"STATUS.ACK","data":"460e64","rssi":"80%"}
+
+When movement is detected:
+
+{"id":"@26e4b0","cmd":"OFF TIMER","data":"30 sec","rssi":"92%"}
+{"id":"@26e4b0","cmd":"OFF TIMER","data":"60 sec","rssi":"88%"}
+{"id":"@26e4b0","cmd":"OFF TIMER","data":"900 sec","rssi":"81%"}
+
+{"id":"@26e4b0","cmd":"STATUS.ACK","data":"0f22001e","rssi":"83%"}
+
+0f = identifier for PIR
+22 = firmware
+001e = number of seconds (30 seconds)
+
+{"id":"@26e4b0","cmd":"STATUS.ACK","data":"0f22012c","rssi":"82%"}
+
+0f = identifier for PIR
+22 = firmware
+001e = number of seconds (300 seconds)
+
+{"id":"@26e4b0","cmd":"STATUS.ACK","data":"0f22003c","rssi":"82%"}
+
+0f = identifier for PIR
+22 = firmware
+003c = number of seconds (60 seconds)
+
+{"id":"@26e4b0","cmd":"STATUS.ACK","data":"0f220384","rssi":"85%"}
+
+0f = identifier for PIR
+22 = firmware
+0384 = number of seconds (900 seconds)
+
+Humidity / Temperature
+
+{"id":"@23c6c0","cmd":"STATUS.ACK","data":"340c8aae6524","rssi":"90%"}
+62% 23'C
+
+{"id":"@23c6c0","cmd":"STATUS.ACK","data":"340c9f1e659c","rssi":"76%"}
+72% 23'C
+
+{"id":"@23c6c0","cmd":"STATUS.ACK","data":"340c92be662c","rssi":"84%"}
+66% 23'C
+
+{"id":"@23c6c0","cmd":"STATUS.ACK","data":"340c823a6674","rssi":"43%"}
+58% 23'C
+
+{"id":"@23c6c0","cmd":"STATUS.ACK","data":"340c4e225aa8","rssi":"41%"}
+32% 15'C
+
+{"id":"@23c6c0","cmd":"STATUS.ACK","data":"340ca4fe5aa4","rssi":"83%"}
+75% 15'C
