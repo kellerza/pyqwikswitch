@@ -9,7 +9,6 @@ Source: http://www.github.com/kellerza/pyqwikswitch
 import logging
 import math
 from enum import Enum
-from typing import Dict
 
 import attr
 
@@ -104,7 +103,7 @@ def _legacy_status(stat):
 class QSDev():
     """A single QS device."""
 
-    data: Dict = attr.ib(validator=attr.validators.instance_of(dict))
+    data = attr.ib(validator=attr.validators.instance_of(dict))
     qstype = attr.ib(init=False, validator=attr.validators.instance_of(QSType))
     value = attr.ib(
         default=-5, validator=attr.validators.instance_of((float, int)))

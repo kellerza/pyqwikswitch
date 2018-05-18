@@ -5,5 +5,5 @@ matrix:
   include:
     - python: "3.5.3"
       env: TOXENV=lint
-    - python: "3.5.3"
-      env: TOXENV=pylint
+script: travis_wait 30 tox --develop
+install: pip install -U tox
