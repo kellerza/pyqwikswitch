@@ -274,7 +274,7 @@ SENSORS = {
     'imod': (decode_imod, bool),
     'door': (decode_door, bool),
     'pir': (decode_pir, bool),
-    'temperature': (decode_temperature, 'degC'),
+    'temperature': (decode_temperature, '°C'),
     'humidity': (decode_humidity, '%'),
     'qwikcord': (decode_qwikcord, 'A/s'),
 }
