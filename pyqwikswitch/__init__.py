@@ -6,7 +6,3 @@ Currently supports relays, buttons and LED dimmers
 
 Source: http://www.github.com/kellerza/pyqwikswitch
 """
-
-from pyqwikswitch.qwikswitch import *  # pylint: disable=wildcard-import
-
-__all__ = ["async_", "threaded"]
