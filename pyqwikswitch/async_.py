@@ -14,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 # pylint: disable=too-many-instance-attributes
-class QSUsb(object):
+class QSUsb():
     """Class to interface the QwikSwitch USB modem."""
 
     def __init__(self, url, dim_adj, callback_value_changed, session):
@@ -35,8 +35,8 @@ class QSUsb(object):
         self._aio_session = session
         self._sleep_task = None
 
-    async def get_json(self, url, timeout=30, astext=False):
-        """Get URL and parse JOSN from text."""
+    async def get_json(self, url, timeout=30, astext=False, exceptions=False):
+        """Get URL and parse JSON from text."""
         try:
             with async_timeout.timeout(timeout):
                 res = await self._aio_session.get(url)
@@ -44,8 +44,10 @@ class QSUsb(object):
                     _LOGGER.error("QSUSB returned %s [%s]", res.status, url)
                     return None
                 res_text = await res.text()
-        except (aiohttp.client_exceptions.ClientConnectorError,
-                asyncio.TimeoutError):
+        except (aiohttp.client_exceptions.ClientError,
+                asyncio.TimeoutError) as exc:
+            if exceptions:
+                raise exc
             return None
 
         if astext:
@@ -77,29 +79,33 @@ class QSUsb(object):
     async def _async_listen(self, callback=None):
         """Listen loop."""
         while True:
-            if self._running:
-                packet = await self.get_json(URL_LISTEN.format(self._url), 30)
-            else:
+            if not self._running:
                 return
 
-            if not packet:
-                _LOGGER.debug('sleep start...')
+            try:
+                packet = await self.get_json(
+                    URL_LISTEN.format(self._url), timeout=30, exceptions=True)
+            except asyncio.TimeoutError:
+                continue
+            except aiohttp.client_exceptions.ClientError as exc:
+                _LOGGER.warning("ClientError: %s", exc)
                 self._sleep_task = self.loop.create_task(asyncio.sleep(30))
                 try:
                     await self._sleep_task
-                    _LOGGER.debug('sleep done...')
                 except asyncio.CancelledError:
-                    _LOGGER.debug('sleep cancelled...')
-
+                    pass
                 self._sleep_task = None
                 continue
 
             if isinstance(packet, dict) and QS_CMD in packet:
+                _LOGGER.debug("callback( %s )", packet)
                 try:
                     callback(packet)
                 except Exception as err:  # pylint: disable=broad-except
                     _LOGGER.error("Exception in callback\nType: %s: %s",
                                   type(err), err)
+            else:
+                _LOGGER.debug("unknown packet? %s", packet)
 
     def set_qs_value(self, qsid, val, success_cb):
         """Push state to QSUSB, retry with backoff."""
