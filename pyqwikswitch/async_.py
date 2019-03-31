@@ -14,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 # pylint: disable=too-many-instance-attributes
-class QSUsb(object):
+class QSUsb():
     """Class to interface the QwikSwitch USB modem."""
 
     def __init__(self, url, dim_adj, callback_value_changed, session):

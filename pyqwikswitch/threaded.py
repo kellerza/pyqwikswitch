@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 # pylint: disable=too-many-instance-attributes
-class QSUsb(object):
+class QSUsb():
     """Class to interface the QwikSwitch USB modem."""
 
     def __init__(self, url, dim_adj, callback_value_changed):
@@ -72,7 +72,7 @@ class QSUsb(object):
                     _LOGGER.error(str(err))
                     sleep(60)
             except Exception as err:  # pylint: disable=broad-except
-                _LOGGER.error(str(type(err)) + str(err))
+                _LOGGER.error("%s - %s", str(type(err)), str(err))
                 sleep(5)
 
         self._queue.put({})  # empty item to ensure callback thread shuts down
