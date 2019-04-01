@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 """Basic usage example and testing of pyqwikswitch."""
 
-from time import sleep
 import json
-import pyqwikswitch
-from pyqwikswitch import (QSType, QS_ID)
-from pyqwikswitch.threaded import (QSUsb)
+from time import sleep
+
+from pyqwikswitch.qwikswitch import (QS_ID, QS_VALUE, QSDevices, QSType,
+                                     decode_qwikcord)
+from pyqwikswitch.threaded import QSUsb
 
 
-def print_bad_data(json):
+def print_bad_data(json_list):
     """Print error if ID invalid."""
-    for dev in json:
+    for dev in json_list:
         if QS_ID not in dev:
             print("**ERR NO ID:", dev)
 
@@ -23,7 +24,7 @@ def print_devices_change_callback(devices, key, new):
         print(" ERR decoding")
     elif dev['value'] == -1:
         dev(" ERR decoding: -1?")
-    qcord = pyqwikswitch.decode_qwikcord(dev['data'][pyqwikswitch.QS_VALUE])
+    qcord = decode_qwikcord(dev['data'][QS_VALUE])
     if qcord is not None:
         print(' qwikcord (CTAVG, CTsum) = ' + str(qcord))
 
@@ -65,7 +66,7 @@ def main():
     if args.file:
         with open(args.file) as data_file:
             data = json.load(data_file)
-        qsusb = pyqwikswitch.QSDevices(
+        qsusb = QSDevices(
             print_devices_change_callback, print_devices_change_callback)
         print_bad_data(data)
         qsusb.set_qs_values(data)

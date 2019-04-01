@@ -5,7 +5,7 @@
 from setuptools import setup
 
 REQUIREMENTS = ['attrs', 'requests']
-VERSION = '0.91'
+VERSION = '0.93'
 
 setup(name='pyqwikswitch',
       version=VERSION,

@@ -97,7 +97,8 @@ class QSUsb():
                 self._sleep_task = None
                 continue
 
-            if isinstance(packet, dict) and QS_CMD in packet:
+            if isinstance(packet, dict) and (
+                    QS_CMD in packet or 'type' in packet):
                 _LOGGER.debug("callback( %s )", packet)
                 try:
                     callback(packet)
