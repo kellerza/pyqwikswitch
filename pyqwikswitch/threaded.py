@@ -8,14 +8,20 @@ from time import sleep
 import requests
 
 from .qwikswitch import (
-    QSDevices, QS_CMD, CMD_UPDATE,
-    URL_DEVICES, URL_LISTEN, URL_SET, URL_VERSION)  # pylint: disable=W0614
+    QSDevices,
+    QS_CMD,
+    CMD_UPDATE,
+    URL_DEVICES,
+    URL_LISTEN,
+    URL_SET,
+    URL_VERSION,
+)  # pylint: disable=W0614
 
 _LOGGER = logging.getLogger(__name__)
 
 
 # pylint: disable=too-many-instance-attributes
-class QSUsb():
+class QSUsb:
     """Class to interface the QwikSwitch USB modem."""
 
     def __init__(self, url, dim_adj, callback_value_changed):
@@ -25,10 +31,11 @@ class QSUsb():
         dim_adj: adjust dimmers values exponentially.
         callback_qs_to_value: set the value upon qs change
         """
-        self._url = url.strip('/')
+        self._url = url.strip("/")
         self._running = False
         self.devices = QSDevices(
-            callback_value_changed, self._callback_set_qs_value, dim_adj)
+            callback_value_changed, self._callback_set_qs_value, dim_adj
+        )
         self._timeout = 300
         self._queue = None
         self._callback_listen = None
@@ -37,7 +44,7 @@ class QSUsb():
 
         # Update internal state
         if not self.update_from_devices():
-            raise ValueError('Cannot connect to the QSUSB hub ' + url)
+            raise ValueError("Cannot connect to the QSUSB hub " + url)
 
     def _thread_worker(self):
         """Process callbacks from the queue populated by &listen."""
@@ -48,25 +55,23 @@ class QSUsb():
                 try:
                     self._callback_listen(packet)
                 except Exception as err:  # pylint: disable=broad-except
-                    _LOGGER.error("Exception in callback\nType: %s: %s",
-                                  type(err), err)
+                    _LOGGER.error("Exception in callback\nType: %s: %s", type(err), err)
             self._queue.task_done()
 
     def _thread_listen(self):
         """The main &listen loop."""
         while self._running:
             try:
-                rest = requests.get(URL_LISTEN.format(self._url),
-                                    timeout=self._timeout)
+                rest = requests.get(URL_LISTEN.format(self._url), timeout=self._timeout)
                 if rest.status_code == 200:
                     self._queue.put(rest.json())
                 else:
-                    _LOGGER.error('QSUSB response code %s', rest.status_code)
+                    _LOGGER.error("QSUSB response code %s", rest.status_code)
                     sleep(30)
 
             # Received for "Read timed out" and "Connection refused"
             except requests.exceptions.ConnectionError as err:
-                if str(err).find('timed') > 0:  # "Read timedout" update
+                if str(err).find("timed") > 0:  # "Read timedout" update
                     self._queue.put({QS_CMD: CMD_UPDATE})
                 else:  # "Connection refused" QSUSB down
                     _LOGGER.error(str(err))
@@ -85,8 +90,9 @@ class QSUsb():
         """Get the QS Mobile version."""
         # requests.get destroys the ?
         import urllib
+
         with urllib.request.urlopen(URL_VERSION.format(self._url)) as response:
-            return response.read().decode('utf-8')
+            return response.read().decode("utf-8")
         return False
 
     def listen(self, callback=None, timeout=(5, 300)):
@@ -111,7 +117,7 @@ class QSUsb():
                 set_result = requests.get(set_url)
                 if set_result.status_code == 200:
                     set_result = set_result.json()
-                    if set_result.get('data', 'NO REPLY') != 'NO REPLY':
+                    if set_result.get("data", "NO REPLY") != "NO REPLY":
                         # self.devices._set_qs_value(key, set_result['data'])
                         success()
                         return True
