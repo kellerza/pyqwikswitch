@@ -2,7 +2,6 @@
 import asyncio
 import json
 import logging
-import async_timeout
 
 import aiohttp
 
@@ -38,7 +37,7 @@ class QSUsb():
     async def get_json(self, url, timeout=30, astext=False, exceptions=False):
         """Get URL and parse JSON from text."""
         try:
-            with async_timeout.timeout(timeout):
+            async with asyncio.timeout(timeout):
                 res = await self._aio_session.get(url)
                 if res.status != 200:
                     _LOGGER.error("QSUSB returned %s [%s]", res.status, url)
