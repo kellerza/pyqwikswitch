@@ -1,22 +1,35 @@
 """QwikSwitch USB Modem async library for Python."""
+
 import asyncio
 import json
 import logging
+from collections.abc import Callable
+from typing import Any
 
 import aiohttp
 
 from .qwikswitch import (
-    QSDevices, QS_CMD, URL_DEVICES, URL_LISTEN, URL_SET, URL_VERSION
-)  # apylint: disable=W0614
+    QS_CMD,
+    URL_DEVICES,
+    URL_LISTEN,
+    URL_SET,
+    URL_VERSION,
+    QSDevices,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 
-# pylint: disable=too-many-instance-attributes
-class QSUsb():
+class QSUsb:
     """Class to interface the QwikSwitch USB modem."""
 
-    def __init__(self, url, dim_adj, callback_value_changed, session):
+    def __init__(
+        self,
+        url: str,
+        dim_adj: float,
+        callback_value_changed: Callable[[str, int | float], None],
+        session: aiohttp.ClientSession,
+    ):
         """Init the Qwikswitch class.
 
         url: URL for the QS class (e.g. http://localhost:8080)
@@ -24,17 +37,25 @@ class QSUsb():
         callback_qs_to_value: set the value upon qs change
         """
         _LOGGER.debug("init %s", url)
-        self._url = url.strip('/')
+        self._url = url.strip("/")
         self.loop = session.loop
         self._running = False
         self.devices = QSDevices(
-            callback_value_changed, self.set_qs_value, dim_adj)
+            cb_value_changed=callback_value_changed,
+            cb_set_qsvalue=self.set_qs_value,
+            dim_adj=dim_adj,
+        )
         self._timeout = 300
-        self._types = {}
+        # self._types = {}
         self._aio_session = session
-        self._sleep_task = None
+        self._sleep_task: asyncio.Task | None = None
 
-    async def get_json(self, url, timeout=30, astext=False, exceptions=False):
+    async def get_text(
+        self,
+        url: str,
+        timeout: int = 30,  # noqa: ASYNC109
+        exceptions: bool = False,
+    ) -> str | None:
         """Get URL and parse JSON from text."""
         try:
             async with asyncio.timeout(timeout):
@@ -42,40 +63,45 @@ class QSUsb():
                 if res.status != 200:
                     _LOGGER.error("QSUSB returned %s [%s]", res.status, url)
                     return None
-                res_text = await res.text()
-        except (aiohttp.client_exceptions.ClientError,
-                asyncio.TimeoutError) as exc:
+                return await res.text()
+        except (TimeoutError, aiohttp.ClientError) as exc:
             if exceptions:
                 raise exc
             return None
 
-        if astext:
-            return res_text
-
+    async def get_json(
+        self,
+        url: str,
+        timeout: int = 30,  # noqa: ASYNC109
+        exceptions: bool = False,
+    ) -> dict[str, Any] | None:
+        """Get URL and parse JSON from text."""
+        res_text = (
+            await self.get_text(url, timeout=timeout, exceptions=exceptions) or ""
+        )
         try:
             return json.loads(res_text)
         except json.decoder.JSONDecodeError:
-            if res_text.strip(" ") == "":
-                return None
             _LOGGER.error("Could not decode %s [%s]", res_text, url)
+        return None
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop listening."""
         self._running = False
         if self._sleep_task:
             self._sleep_task.cancel()
             self._sleep_task = None
 
-    def version(self):
+    async def version(self) -> str:
         """Get the QS Mobile version."""
-        return self.get_json(URL_VERSION.format(self._url), astext=True)
+        return await self.get_text(URL_VERSION.format(self._url)) or ""
 
-    def listen(self, callback=None):
+    def listen(self, callback=None) -> None:
         """Start the &listen long poll and return immediately."""
         self._running = True
         self.loop.create_task(self._async_listen(callback))
 
-    async def _async_listen(self, callback=None):
+    async def _async_listen(self, callback=None) -> None:
         """Listen loop."""
         while True:
             if not self._running:
@@ -83,10 +109,11 @@ class QSUsb():
 
             try:
                 packet = await self.get_json(
-                    URL_LISTEN.format(self._url), timeout=30, exceptions=True)
-            except asyncio.TimeoutError:
+                    URL_LISTEN.format(self._url), timeout=30, exceptions=True
+                )
+            except TimeoutError:
                 continue
-            except aiohttp.client_exceptions.ClientError as exc:
+            except aiohttp.ClientError as exc:
                 _LOGGER.warning("ClientError: %s", exc)
                 self._sleep_task = self.loop.create_task(asyncio.sleep(30))
                 try:
@@ -99,23 +126,27 @@ class QSUsb():
             if isinstance(packet, dict) and QS_CMD in packet:
                 _LOGGER.debug("callback( %s )", packet)
                 try:
-                    callback(packet)
-                except Exception as err:  # pylint: disable=broad-except
-                    _LOGGER.error("Exception in callback\nType: %s: %s",
-                                  type(err), err)
+                    if callback:
+                        callback(packet)
+                except Exception as err:
+                    _LOGGER.error("Exception in callback\nType: %s: %s", type(err), err)
             else:
                 _LOGGER.debug("unknown packet? %s", packet)
 
-    def set_qs_value(self, qsid, val, success_cb):
+    def set_qs_value(
+        self, qsid: str, val: float, success_cb: Callable[[], None]
+    ) -> None:
         """Push state to QSUSB, retry with backoff."""
         self.loop.create_task(self.async_set_qs_value(qsid, val, success_cb))
 
-    async def async_set_qs_value(self, qsid, val, success_cb=None):
+    async def async_set_qs_value(
+        self, qsid: str, val: float, success_cb: Callable[[], None] | None = None
+    ) -> bool:
         """Push state to QSUSB, retry with backoff."""
         set_url = URL_SET.format(self._url, qsid, val)
         for _repeat in range(1, 6):
             set_result = await self.get_json(set_url, 2)
-            if set_result and set_result.get('data', 'NO REPLY') != 'NO REPLY':
+            if set_result and set_result.get("data", "NO REPLY") != "NO REPLY":
                 if success_cb:
                     success_cb()
                 return True
@@ -123,10 +154,10 @@ class QSUsb():
         _LOGGER.error("Unable to set %s", set_url)
         return False
 
-    async def update_from_devices(self):
+    async def update_from_devices(self) -> bool:
         """Retrieve a list of &devices and values."""
         res = await self.get_json(URL_DEVICES.format(self._url))
-        if res:
+        if isinstance(res, list):
             self.devices.update_devices(res)
             return True
         return False

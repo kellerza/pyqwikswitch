@@ -1,11 +1,16 @@
-#!/usr/bin/env python
 """Basic usage example and testing of pyqwikswitch."""
 
-from time import sleep
+import argparse
+import asyncio
 import json
-import pyqwikswitch
-from pyqwikswitch import (QSType, QS_ID)
-from pyqwikswitch.threaded import (QSUsb)
+from collections.abc import Callable
+from pathlib import Path
+from time import sleep
+
+from aiohttp import ClientSession
+
+from pyqwikswitch.async_ import QSUsb
+from pyqwikswitch.qwikswitch import QS_ID, QS_VALUE, QSDevices, QSType, decode_qwikcord
 
 
 def print_bad_data(json):
@@ -15,25 +20,31 @@ def print_bad_data(json):
             print("**ERR NO ID:", dev)
 
 
-def print_devices_change_callback(devices, key, new):
+DEVS: QSDevices = None  # type: ignore[assignment]
+
+
+def print_devices_change_callback(
+    key: str, new: float, cb: Callable[[], None] | None = None
+):
     """Print the reply from &devices() and highlight errors."""
-    dev = devices[key]
-    print('- ', new, ' ', dev)
-    if dev['type'] == QSType.unknown:
+    dev = DEVS[key]
+    print("- ", new, " ", dev)
+    if dev.qstype == QSType.unknown:
         print(" ERR decoding")
-    elif dev['value'] == -1:
-        dev(" ERR decoding: -1?")
-    qcord = pyqwikswitch.decode_qwikcord(dev['data'][pyqwikswitch.QS_VALUE])
+    elif dev.value == -1:
+        print(" ERR decoding: -1?")
+    qcord = decode_qwikcord(dev.data[QS_VALUE])  # type: ignore[arg-type]
     if qcord is not None:
-        print(' qwikcord (CTAVG, CTsum) = ' + str(qcord))
+        print(" qwikcord (CTAVG, CTsum) = " + str(qcord))
 
 
 def print_item_callback(item):
     """Print an item callback, used by &listen."""
-    print('&listen [{}, {}={}]'.format(
-        item.get('cmd', ''),
-        item.get('id', ''),
-        item.get('data', '')))
+    print(
+        "&listen [{}, {}={}]".format(
+            item.get("cmd", ""), item.get("id", ""), item.get("data", "")
+        )
+    )
 
 
 def test_devices_set(devices, ids):
@@ -44,51 +55,56 @@ def test_devices_set(devices, ids):
     for _id in ids:
         for value in (10, 9):
             sleep(3)
-            print("\nSet {} = {}".format(_id, value))
+            print(f"\nSet {_id} = {value}")
             val = devices.set_value(_id, value)
-            print("   --> result: {}".format(val))
+            print(f"   --> result: {val}")
             print(devices[_id])
         sleep(2)
 
 
-def main():
+async def main():
     """Quick test for QSUsb class."""
-    import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--url', help='QSUSB URL [http://127.0.0.1:2020]',
-                        default='http://127.0.0.1:2020')
-    parser.add_argument('--file', help='a test file from /&devices')
-    parser.add_argument('--test_ids', help='List of test IDs',
-                        default='@0c2700,@0ac2f0')
+    parser.add_argument(
+        "--url",
+        help="QSUSB URL [http://127.0.0.1:2020]",
+        default="http://127.0.0.1:2020",
+    )
+    parser.add_argument("--file", help="a test file from /&devices")
+    parser.add_argument(
+        "--test_ids", help="List of test IDs", default="@0c2700,@0ac2f0"
+    )
     args = parser.parse_args()
 
     if args.file:
-        with open(args.file) as data_file:
+        with Path(args.file).open(encoding="utf-8") as data_file:  # noqa: ASYNC230
             data = json.load(data_file)
-        qsusb = pyqwikswitch.QSDevices(
-            print_devices_change_callback, print_devices_change_callback)
+        global DEVS  # noqa: PLW0603
+        DEVS = QSDevices(print_devices_change_callback, print_devices_change_callback)
         print_bad_data(data)
-        qsusb.set_qs_values(data)
+        # await DEVS.set_value(data)
         return
 
-    print('Execute a basic test on server: {}\n'.format(args.url))
+    print(f"Execute a basic test on server: {args.url}\n")
 
-    def qs_to_value(key, new):
-        print(" --> New value: {}={}".format(key, new))
+    def qs_to_value(key: str, new: float):
+        print(f" --> New value: {key}={new}")
 
-    qsusb = QSUsb(args.url, 1, qs_to_value)
-    print('Version: ' + qsusb.version())
-    qsusb.set_qs_values()
+    session = ClientSession()
 
-    qsusb.listen(print_item_callback, timeout=5)
+    qsusb = QSUsb(args.url, 1, qs_to_value, session)
+    print("Version: " + await qsusb.version())
+    # await qsusb.set_qs_value()
+
     print("Started listening")
+    qsusb.listen(print_item_callback)
     try:
         # Do some test while listening
         if args.test_ids and len(args.test_ids) > 0:
-            test_devices_set(qsusb.devices, args.test_ids.split(','))
+            test_devices_set(qsusb.devices, args.test_ids.split(","))
 
         print("\n\nListening for 60 seconds (test buttons now)\n")
-        sleep(60)
+        await asyncio.sleep(60)
     except KeyboardInterrupt:
         pass
     finally:
@@ -97,4 +113,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
