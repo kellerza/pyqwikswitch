@@ -8,14 +8,14 @@ version = "0.1.0"
 description = "Library to interface Qwikswitch USB Hub"
 readme = "README.md"
 keywords = [ "asyncio", "qwikswitch" ]
-license = { text = "MIT" }
+license = { file = "LICENSE" }
 authors = [ { name = "Johann Kellerman", email = "kellerza@gmail.com" } ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
   "aiohttp>=3.12.15",
@@ -26,12 +26,12 @@ dependencies = [
 dev = [
   "codespell",
   "mypy",
-  "pyproject-fmt>=2.6",
+  "pyproject-fmt",
   "pytest",
   "pytest-asyncio",
-  "ruff>=0.13.1",
+  "pytest-cov",
+  "pytest-github-actions-annotate-failures",
   "types-attrs",
-  "types-requests",
 ]
 
 [tool.ruff]
@@ -68,4 +68,22 @@ norecursedirs = [ ".git", "modules" ]
 log_cli = true
 log_cli_level = "DEBUG"
 asyncio_mode = "auto"
-#addopts = "--cov=src --cov-report xml:cov.xml"
+addopts = "--cov=src --cov-report xml:cov.xml"
+
+[tool.semantic_release]
+commit = true
+tag = true
+vcs_release = true
+commit_parser = "emoji"
+# https://python-semantic-release.readthedocs.io/en/latest/configuration.html#version-toml
+version_toml = [ "pyproject.toml:project.version" ]
+build_command = "pip install uv && uv build"
+commit_version_number = true
+
+[tool.semantic_release.branches.main]
+match = "main"
+
+[tool.semantic_release.commit_parser_options]
+major_tags = [ ":boom:" ]
+minor_tags = [ ":rocket:" ]
+patch_tags = [ "" ]
