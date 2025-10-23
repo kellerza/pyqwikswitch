@@ -9,7 +9,7 @@ from time import sleep
 
 from aiohttp import ClientSession
 
-from pyqwikswitch.async_ import QSUsb
+from pyqwikswitch import qsusb_factory
 from pyqwikswitch.qwikswitch import QS_ID, QS_VALUE, QSDevices, QSType, decode_qwikcord
 
 
@@ -92,7 +92,7 @@ async def main():
 
     session = ClientSession()
 
-    qsusb = QSUsb(args.url, 1, qs_to_value, session)
+    qsusb = await qsusb_factory(args.url, 1, qs_to_value, session)
     print("Version: " + await qsusb.version())
     # await qsusb.set_qs_value()
 
