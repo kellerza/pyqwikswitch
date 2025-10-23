@@ -4,7 +4,7 @@ requires = [ "uv-build>=0.8.20,<0.9" ]
 
 [project]
 name = "pyqwikswitch"
-version = "0.1.0"
+version = "1.0.0"
 description = "Library to interface Qwikswitch USB Hub"
 readme = "README.md"
 keywords = [ "asyncio", "qwikswitch" ]
