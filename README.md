@@ -1,8 +1,8 @@
-# pyqwikswitch library 
-[![Build Status](https://travis-ci.com/kellerza/pyqwikswitch.svg?branch=master)](https://travis-ci.com/kellerza/pyqwikswitch)
+# pyqwikswitch library
+
 QwikSwitch USB Modem library for Python 3
 
-  See http://www.qwikswitch.co.za for more information on the Qwikswitch devices. 
+  See http://www.qwikswitch.co.za for more information on the Qwikswitch devices.
 
   The library contains threaded and async interfaces and supports relays, buttons, LED dimmers and decoding of various [sensors](https://github.com/kellerza/pyqwikswitch/blob/master/pyqwikswitch/qwikswitch.py#L277)
 
