@@ -2,6 +2,7 @@
 .pytest_cache
 .ruff_cache
 .venv
+cov.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
