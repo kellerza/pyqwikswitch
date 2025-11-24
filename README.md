@@ -1,4 +1,4 @@
-# pyqwikswitch library
+# pyqwikswitch library [![codecov](https://codecov.io/gh/kellerza/pyqwikswitch/graph/badge.svg?token=aw8RRebC8L)](https://codecov.io/gh/kellerza/pyqwikswitch)
 
 QwikSwitch USB Modem library for Python 3
 
