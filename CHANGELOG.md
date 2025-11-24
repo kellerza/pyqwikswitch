@@ -2,6 +2,17 @@
 
 <!-- version list -->
 
+## v1.0.2 (2025-11-24)
+
+### 
+
+- Add Codecov badge to README
+  ([`dfe857b`](https://github.com/kellerza/pyqwikswitch/commit/dfe857bcdaf2d596d2e12396d028624b61d50c57))
+
+- Added Codecov badge to README for coverage tracking.
+  ([`dfe857b`](https://github.com/kellerza/pyqwikswitch/commit/dfe857bcdaf2d596d2e12396d028624b61d50c57))
+
+
 ## v1.0.1 (2025-11-24)
 
 ### 
