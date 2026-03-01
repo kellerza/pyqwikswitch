@@ -2,6 +2,27 @@
 
 <!-- version list -->
 
+## v1.0.3 (2026-03-01)
+
+### 
+
+-
+  ([`e427579`](https://github.com/kellerza/pyqwikswitch/commit/e42757937ba904dd75b59dd60585354cf6e298c8))
+
+- ---
+  ([`e427579`](https://github.com/kellerza/pyqwikswitch/commit/e42757937ba904dd75b59dd60585354cf6e298c8))
+
+- Bump python-semantic-release/python-semantic-release
+  ([`e427579`](https://github.com/kellerza/pyqwikswitch/commit/e42757937ba904dd75b59dd60585354cf6e298c8))
+
+- Bumps the actions-deps group with 1 update:
+  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release).
+  ([`e427579`](https://github.com/kellerza/pyqwikswitch/commit/e42757937ba904dd75b59dd60585354cf6e298c8))
+
+- Signed-off-by: dependabot[bot] <support@github.com>
+  ([`e427579`](https://github.com/kellerza/pyqwikswitch/commit/e42757937ba904dd75b59dd60585354cf6e298c8))
+
+
 ## v1.0.2 (2025-11-24)
 
 ### 
