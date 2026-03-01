@@ -2,6 +2,30 @@
 
 <!-- version list -->
 
+## v1.0.4 (2026-03-01)
+
+### 
+
+- ---
+  ([`b7b3139`](https://github.com/kellerza/pyqwikswitch/commit/b7b3139610d7c8d98f6ed980ca95c5dd4d8029ca))
+
+- Signed-off-by: dependabot[bot] <support@github.com>
+  ([`b7b3139`](https://github.com/kellerza/pyqwikswitch/commit/b7b3139610d7c8d98f6ed980ca95c5dd4d8029ca))
+
+- Update pyproject.toml
+  ([`da479f0`](https://github.com/kellerza/pyqwikswitch/commit/da479f031b8d8d4a38233a8f5383455d48532545))
+
+- Update uv-build requirement in the dev-deps group
+  ([`b7b3139`](https://github.com/kellerza/pyqwikswitch/commit/b7b3139610d7c8d98f6ed980ca95c5dd4d8029ca))
+
+- Updates `uv-build` to 0.9.17
+  ([`b7b3139`](https://github.com/kellerza/pyqwikswitch/commit/b7b3139610d7c8d98f6ed980ca95c5dd4d8029ca))
+
+- Updates the requirements on [uv-build](https://github.com/astral-sh/uv) to permit the latest
+  version.
+  ([`b7b3139`](https://github.com/kellerza/pyqwikswitch/commit/b7b3139610d7c8d98f6ed980ca95c5dd4d8029ca))
+
+
 ## v1.0.3 (2026-03-01)
 
 ### 
