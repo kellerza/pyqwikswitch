@@ -63,7 +63,7 @@ class QSUsb:
         url: str,
         timeout: int = 30,  # noqa: ASYNC109
         exceptions: bool = False,
-    ) -> dict[str, Any] | None:
+    ) -> dict[str, Any] | list[Any] | None:
         """Get URL and parse JSON from text."""
         _LOGGER.debug("GET %s", url)
         try:
@@ -156,7 +156,10 @@ class QSUsb:
         set_url = URL_SET.format(self.url, qsid, val)
         for _repeat in range(1, 6):
             set_result = await self.get_json(set_url, 2)
-            if set_result and set_result.get("data", "NO REPLY") != "NO REPLY":
+            if (
+                isinstance(set_result, dict)
+                and set_result.get("data", "NO REPLY") != "NO REPLY"
+            ):
                 if success_cb:
                     success_cb()
                 return True

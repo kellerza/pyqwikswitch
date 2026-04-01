@@ -9,7 +9,7 @@ from aioresponses import aioresponses
 from pyqwikswitch import QSDev, QSDevices, QSUsb
 
 
-async def test_qsusb_init(qsusb):
+async def test_qsusb_init(qsusb: QSUsb) -> None:
     """Test Qsusb."""
     assert qsusb.url == "http://localhost:2020"
     assert qsusb.devices.dim_adj == 0.123
@@ -17,7 +17,7 @@ async def test_qsusb_init(qsusb):
 
 async def test_devices(
     qsusb: QSUsb, mock_aioresponse: aioresponses, example_devices: QSDevices
-):
+) -> None:
     """Test Qsusb devices."""
     dl = [d.data for d in example_devices.values()]
 
@@ -57,7 +57,7 @@ async def test_listen(qsusb: QSUsb, mock_aioresponse: aioresponses):
     assert cb.call_args_list == [call(p) for p in packets]
 
 
-async def test_version(qsusb: QSUsb, mock_aioresponse: aioresponses):
+async def test_version(qsusb: QSUsb, mock_aioresponse: aioresponses) -> None:
     """Test Qsusb version."""
     mock_aioresponse.get("http://localhost:2020/&version?", body="1.0.0")
     version = await qsusb.version()

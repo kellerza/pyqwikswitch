@@ -26,7 +26,6 @@ dependencies = [
 dev = [
   "aioresponses",
   "codespell",
-  "mypy",
   "pyproject-fmt",
   "pytest",
   "pytest-asyncio",
@@ -61,14 +60,14 @@ lint.pylint.max-args = 7
 [tool.codespell]
 ignore-words-list = [ "hass" ]
 
-[tool.pytest.ini_options]
-pythonpath = [ "src" ]
-testpaths = "src/tests"
-norecursedirs = [ ".git", "modules" ]
-log_cli = true
-log_cli_level = "DEBUG"
-asyncio_mode = "auto"
-addopts = "--cov=src --cov-report xml:cov.xml"
+[tool.pytest]
+ini_options.pythonpath = [ "src" ]
+ini_options.testpaths = "src/tests"
+ini_options.norecursedirs = [ ".git", "modules" ]
+ini_options.log_cli = true
+ini_options.log_cli_level = "DEBUG"
+ini_options.asyncio_mode = "auto"
+ini_options.addopts = "--cov=src --cov-report xml:cov.xml"
 
 [tool.semantic_release]
 commit = true
@@ -79,11 +78,7 @@ commit_parser = "emoji"
 version_toml = [ "pyproject.toml:project.version" ]
 build_command = "pip install uv && uv build"
 commit_version_number = true
-
-[tool.semantic_release.branches.main]
-match = "main"
-
-[tool.semantic_release.commit_parser_options]
-major_tags = [ ":boom:" ]
-minor_tags = [ ":rocket:" ]
-patch_tags = [ "" ]
+branches.main.match = "main"
+commit_parser_options.major_tags = [ ":boom:" ]
+commit_parser_options.minor_tags = [ ":rocket:" ]
+commit_parser_options.patch_tags = [ "" ]

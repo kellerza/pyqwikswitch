@@ -1,10 +1,11 @@
 # pyqwikswitch library [![codecov](https://codecov.io/gh/kellerza/pyqwikswitch/graph/badge.svg?token=aw8RRebC8L)](https://codecov.io/gh/kellerza/pyqwikswitch)
 
-QwikSwitch USB Modem library for Python 3
+QwikSwitch USB Modem library for Python 3.
+The library supports relays, buttons, LED dimmers and decoding of various [sensors](https://github.com/kellerza/pyqwikswitch/blob/main/pyqwikswitch/qwikswitch.py#L277)
 
-  See http://www.qwikswitch.co.za for more information on the Qwikswitch devices.
+See http://www.qwikswitch.co.za for more information on the Qwikswitch devices.
 
-  The library contains threaded and async interfaces and supports relays, buttons, LED dimmers and decoding of various [sensors](https://github.com/kellerza/pyqwikswitch/blob/master/pyqwikswitch/qwikswitch.py#L277)
+The library is used in the Home Assistant [QwikSwitch integration](https://www.home-assistant.io/integrations/qwikswitch/)
 
 ##  QSUsb class
 
@@ -13,7 +14,7 @@ QwikSwitch USB Modem library for Python 3
   `QSUsb.devices()`
 
   ```
-  [{"id": "@0c26e0","name": "buitelig","type": "rel","val": "ON",
+  [{"id": "@0c26e0","name": "Light 1","type": "rel","val": "ON",
         "time": "1460146507","rssi": "45%"},
     .....]
   ```
@@ -28,7 +29,7 @@ QwikSwitch USB Modem library for Python 3
 
   `QSUsb.set(id, value)`
 
-  Dimmers values can be adjusted to get a more linear behaviour by setting `dim_adj` between 1 - 2
+  Dimmer values can be adjusted to get a more linear behavior by setting `dim_adj` between 1 - 2
 
 
 ## Example usage
