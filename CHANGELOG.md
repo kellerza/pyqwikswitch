@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.6 (2026-04-01)
+
+### 
+
+- Zuban
+  ([`9251ca8`](https://github.com/kellerza/pyqwikswitch/commit/9251ca8eb39ce868de01f72b72a80c3140ef0037))
+
+
 ## v1.0.5 (2026-04-01)
 
 ### 
