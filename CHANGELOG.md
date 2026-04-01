@@ -2,6 +2,27 @@
 
 <!-- version list -->
 
+## v1.0.5 (2026-04-01)
+
+### 
+
+-
+  ([`3b69f29`](https://github.com/kellerza/pyqwikswitch/commit/3b69f298824a010b0ebc971282a53e75722d8444))
+
+- ---
+  ([`3b69f29`](https://github.com/kellerza/pyqwikswitch/commit/3b69f298824a010b0ebc971282a53e75722d8444))
+
+- Bump codecov/codecov-action from 5 to 6 in the actions-deps group
+  ([`3b69f29`](https://github.com/kellerza/pyqwikswitch/commit/3b69f298824a010b0ebc971282a53e75722d8444))
+
+- Bumps the actions-deps group with 1 update:
+  [codecov/codecov-action](https://github.com/codecov/codecov-action).
+  ([`3b69f29`](https://github.com/kellerza/pyqwikswitch/commit/3b69f298824a010b0ebc971282a53e75722d8444))
+
+- Signed-off-by: dependabot[bot] <support@github.com>
+  ([`3b69f29`](https://github.com/kellerza/pyqwikswitch/commit/3b69f298824a010b0ebc971282a53e75722d8444))
+
+
 ## v1.0.4 (2026-03-01)
 
 ### 
