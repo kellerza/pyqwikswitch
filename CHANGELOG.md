@@ -2,6 +2,39 @@
 
 <!-- version list -->
 
+## v1.0.7 (2026-08-04)
+
+### 
+
+-
+  ([`4ef5e25`](https://github.com/kellerza/pyqwikswitch/commit/4ef5e2555882cc85127b4c0ea63430162a1c287d))
+
+- ---
+  ([`4ef5e25`](https://github.com/kellerza/pyqwikswitch/commit/4ef5e2555882cc85127b4c0ea63430162a1c287d))
+
+- Bump the actions-deps group across 1 directory with 4 updates
+  ([`4ef5e25`](https://github.com/kellerza/pyqwikswitch/commit/4ef5e2555882cc85127b4c0ea63430162a1c287d))
+
+- Bumps the actions-deps group with 4 updates in the / directory:
+  [actions/checkout](https://github.com/actions/checkout),
+  [actions/setup-python](https://github.com/actions/setup-python),
+  [codecov/codecov-action](https://github.com/codecov/codecov-action) and
+  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release).
+  ([`4ef5e25`](https://github.com/kellerza/pyqwikswitch/commit/4ef5e2555882cc85127b4c0ea63430162a1c287d))
+
+- Signed-off-by: dependabot[bot] <support@github.com>
+  ([`4ef5e25`](https://github.com/kellerza/pyqwikswitch/commit/4ef5e2555882cc85127b4c0ea63430162a1c287d))
+
+- Updates `actions/setup-python` from 6 to 7
+  ([`4ef5e25`](https://github.com/kellerza/pyqwikswitch/commit/4ef5e2555882cc85127b4c0ea63430162a1c287d))
+
+- Updates `codecov/codecov-action` from 6 to 7
+  ([`4ef5e25`](https://github.com/kellerza/pyqwikswitch/commit/4ef5e2555882cc85127b4c0ea63430162a1c287d))
+
+- Updates `python-semantic-release/python-semantic-release` from 10.5.3 to 10.6.1
+  ([`4ef5e25`](https://github.com/kellerza/pyqwikswitch/commit/4ef5e2555882cc85127b4c0ea63430162a1c287d))
+
+
 ## v1.0.6 (2026-04-01)
 
 ### 
